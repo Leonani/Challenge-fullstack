@@ -24,14 +24,12 @@ export const usePosts = () => {
         const response = await apiFetch(`/posts?page=${page}&limit=10`);
 
         setPosts(response.data ?? []);
-        setTotalPages(response.meta.totalPages );
+        setTotalPages(response.meta?.lastPage ?? 1);
 
       } catch (err) {
-        
         console.error("Error al obtener posts", err);
         setError("No se pudieron cargar los posts");
         setPosts([]);
-
       } finally {
         setLoading(false);
       }
@@ -49,5 +47,6 @@ export const usePosts = () => {
     error,
   };
 };
+
 
 

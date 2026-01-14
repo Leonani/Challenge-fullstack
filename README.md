@@ -12,6 +12,7 @@ Tecnologías utilizadas:
 - Seguridad: Guards y decoradores para permisos  
 
 ## Setup Backend
+
 1. Clonar el repositorio y entrar a la carpeta backend:
 ```bash
 cd backend
@@ -109,3 +110,121 @@ src/
 | JWT_SECRET   | Clave secreta para JWT             |
 | PORT         | Puerto del backend                 |
 | NODE_ENV     | Entorno (development / production) |
+
+# Setup Frontend
+
+Frontend desarrollado como parte de un challenge técnico fullstack, consumiendo una API REST construida en NestJS.  
+El foco está puesto en arquitectura, separación de responsabilidades y buenas prácticas.
+
+---
+
+## 🧱 Stack Tecnológico
+
+- React 18
+- TypeScript
+- Vite
+- TailwindCSS
+- React Router DOM
+- Fetch API
+- Autenticación JWT
+
+---
+
+## 🏗️ Arquitectura
+
+Se utiliza una arquitectura orientada a separación clara de responsabilidades:
+
+- **Pages**: composición de vistas
+- **Containers**: manejo de estado y lógica
+- **Components**: render puro (presentational)
+- **Hooks**: lógica reutilizable
+- **Context**: estado global (auth)
+- **API**: acceso centralizado al backend
+
+```txt
+src/
+├── api/
+│   └── api.ts
+├── components/
+│   └── PostCard.tsx
+├── containers/
+│   └── PostsContainer.tsx
+├── context/
+│   └── AuthContext.tsx
+├── hooks/
+│   ├── useAuth.ts
+│   ├── usePosts.ts
+│   └── useProfile.ts
+├── pages/
+│   ├── Login.tsx
+│   ├── Register.tsx
+│   ├── Posts.tsx
+│   ├── PostDetail.tsx
+│   ├── Profile.tsx
+│   └── CreatePost.tsx
+├── routes/
+│   └── AppRoutes.tsx
+├── styles/
+│   └── index.css
+└── main.tsx
+```
+## 🔐 Autenticación
+
+- Autenticación basada en JWT
+- El token se guarda en un AuthContext
+- Se envía automáticamente en requests protegidas
+
+```bash
+Authorization: Bearer <token>
+```
+
+## 🌐 Comunicación con la API
+
+Toda la comunicación con el backend se centraliza en un helper único:
+```bash
+apiFetch(endpoint, options)
+```
+Ventajas:
+
+-Manejo uniforme de errores
+-Evita duplicación de lógica
+-Facilita cambios futuros (interceptors, refresh token)
+
+## 📄 Manejo de Estado
+
+- Estado local con useState
+- Side effects con useEffect
+- Hooks personalizados para cada dominio
+- Fallbacks defensivos ante respuestas inválidas
+
+## 🧭 Ruteo
+
+- React Router DOM
+- Rutas públicas y privadas
+- Protección basada en estado de autenticación
+
+## 🎨 UI / Estilos
+
+- TailwindCSS
+- Enfoque utility-first
+- Componentes desacoplados de la lógica
+- UI simple y consistente
+
+## ⚙️ Configuración
+Requisitos:
+- Node.js 18.x
+- pnpm
+
+##
+1. Variables de entorno:
+```bash
+VITE_API_URL=http://localhost:3000
+```
+2. Instalación:
+```bash
+pnpm install
+```
+3. Ejecución:
+```bash
+pnpm dev
+```

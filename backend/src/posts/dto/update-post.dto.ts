@@ -1,6 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdatePostDto {
-  @IsOptional() @IsString() title?: string;
-  @IsOptional() @IsString() content?: string;
+  @IsOptional() @IsString()  @MinLength(1) @MaxLength(50) title?: string;
+  @IsOptional() @IsString() @MinLength(1) @MaxLength(245) content?: string;
 }
