@@ -1,15 +1,15 @@
-import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Navigate, useLocation } from "react-router-dom";
 
-type Props = {
-  children: JSX.Element;
-};
+export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+  const { token, loading } = useAuth();
+  const location = useLocation();
 
-export const PrivateRoute = ({ children }: Props) => {
-  const { token } = useAuth();
+  if (loading) return <p>Cargando...</p>;
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    // redirige al home si no hay token
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return children;

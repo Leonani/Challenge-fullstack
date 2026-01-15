@@ -6,7 +6,7 @@ import {
   ReactNode,
 } from "react";
 
-type AuthContextType = {
+export type AuthContextType = {
   token: string | null;
   userId: string | null;
   userName: string | null;
@@ -16,6 +16,7 @@ type AuthContextType = {
   logout: () => void;
 };
 
+// Contexto con valores por defecto
 const AuthContext = createContext<AuthContextType>({
   token: null,
   userId: null,
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
+// Hook para consumir el contexto
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -34,19 +36,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Inicialización del auth desde localStorage
+  // Inicialización desde localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUserId = localStorage.getItem("userId");
-    const storedUserName = localStorage.getItem("userName");
-
-    if (storedToken) setToken(storedToken);
-    if (storedUserId) setUserId(storedUserId);
-    if (storedUserName) setUserName(storedUserName);
-
+    setToken(localStorage.getItem("token") || null);
+    setUserId(localStorage.getItem("userId") || null);
+    setUserName(localStorage.getItem("userName") || null);
     setLoading(false);
   }, []);
 
+  // Login
   const login = async (email: string, password: string) => {
     try {
       const res = await fetch("http://localhost:3000/auth/login", {
@@ -59,21 +57,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const data = await res.json();
 
-      // ✅ Guardar token y datos del usuario correctamente
+      // Validar que la API devuelva user
+      if (!data.accessToken || !data.user?.id || !data.user?.name) {
+        throw new Error("Respuesta de login inválida");
+      }
+
+      // Guardar en state
       setToken(data.accessToken);
       setUserId(data.user.id);
       setUserName(data.user.name);
 
+      // Guardar en localStorage
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("userId", data.user.id);
       localStorage.setItem("userName", data.user.name);
 
       return true;
-    } catch {
+    } catch (err) {
+      console.error("Login error:", err);
       return false;
     }
   };
 
+  // Registro
   const register = async (email: string, name: string, password: string) => {
     try {
       const res = await fetch("http://localhost:3000/auth/register", {
@@ -85,11 +91,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!res.ok) throw new Error("Registro fallido");
 
       return true;
-    } catch {
+    } catch (err) {
+      console.error("Register error:", err);
       return false;
     }
   };
 
+  // Logout
   const logout = () => {
     setToken(null);
     setUserId(null);
@@ -102,12 +110,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, userId, userName, loading, login, register, logout }}
+      value={{
+        token,
+        userId,
+        userName,
+        loading,
+        login,
+        register,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-
-

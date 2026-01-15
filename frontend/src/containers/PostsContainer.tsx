@@ -22,19 +22,22 @@ export const PostsContainer = () => {
         <p className="text-center text-gray-500">No hay posts para mostrar</p>
       )}
 
-      <div className="flex flex-col md:flex-row md:flex-wrap gap-4 justify-center">
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            id={post.id}
-            title={post.title}
-            content={post.content}
-            author={post.user?.name || "Desconocido"}
-            authorId={post.user?.id ?? ""}
-            onEdit={userId === post.user?.id ? handleEdit : undefined} // ✅ comparamos por ID
-          />
-        ))}
+      <div className="h-[65vh] overflow-y-auto px-2">
+        <div className="flex flex-col md:flex-row md:flex-wrap gap-4 justify-center ">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              id={post.id}
+              title={post.title}
+              content={post.content}
+              author={post.user?.name || "Desconocido"}
+              authorId={post.user?.id ?? ""}
+              onEdit={userId === post.user?.id ? handleEdit : undefined} // ✅ comparamos por ID
+            />
+          ))}
+        </div>
       </div>
+
       {/* Paginación */}
       {totalPages > 1 && (
         <div className="flex gap-2 justify-center mt-6 items-center">
