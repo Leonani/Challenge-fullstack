@@ -20,7 +20,12 @@ export const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
 
         <Route path="/" element={<Posts />} />
-        <Route path="/posts/edit/:id" element={<EditPost />} />
+        
+        <Route path="/posts/edit/:id" element={
+          <PrivateRoute>
+            <EditPost />
+          </PrivateRoute>
+        } />
 
         {/* Privadas */}
         <Route
