@@ -7,3 +7,4 @@ export const Posts = () => {
     </div>
   );
 };
+export default Posts;

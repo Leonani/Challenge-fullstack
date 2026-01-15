@@ -1,29 +1,35 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEditPost } from "../hooks/useEditPost";
 
 export const EditPostContainer = () => {
   const { id } = useParams<{ id: string }>();
   if (!id) throw new Error("Post ID requerido");
 
-  const { submit, loading, error, success } = useEditPost(id);
+  const { post, submit, loading, error, success } = useEditPost(id);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submit({ title, content });
+  // Llenar los valores iniciales cuando cargue el post
+  useEffect(() => {
+    if (post) {
+      setTitle(post.title);
+      setContent(post.content);
+    }
+  }, [post]);
+
+  const handleSubmit = (data: { title: string; content: string }) => {
+    submit(data);
   };
 
   return {
-    title,
-    setTitle,
-    content,
-    setContent,
-    handleSubmit,
+    defaultTitle: title,
+    defaultContent: content,
+    onSubmit: handleSubmit,
     loading,
     error,
     success,
   };
 };
+

@@ -2,13 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException,
 import { PrismaService } from '../common/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   // Listar todos los posts con paginación
-  async getAll(page: number = 1, limit: number = 10) {
+  async getAll(page: number = 1, limit: number = 5) {
     if (page < 1) throw new BadRequestException('Página inválida');
     if (limit < 1) throw new BadRequestException('Límite inválido');
 
@@ -95,6 +96,7 @@ export class PostsService {
     } catch (error) {
       throw new InternalServerErrorException('Error al actualizar el post');
     }
+    
   }
 
 }

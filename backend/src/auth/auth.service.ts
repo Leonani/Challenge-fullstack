@@ -48,12 +48,7 @@ export class AuthService {
       throw new BadRequestException('Email y contraseña son obligatorios');
     }
 
-    let user;
-    try {
-      user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    } catch (error) {
-      throw new InternalServerErrorException('Error al consultar el usuario');
-    }
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
 
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
 
@@ -62,7 +57,16 @@ export class AuthService {
 
     // Generar JWT
     const accessToken = this.jwtService.sign({ sub: user.id });
-    return { accessToken };
+
+    // Devolver token y user info
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    };
   }
 }
 
