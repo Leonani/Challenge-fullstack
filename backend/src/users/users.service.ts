@@ -17,33 +17,45 @@ export class UsersService {
 
   // Actualizar un usuario
   async updateUser(id: string, dto: UpdateUserDto) {
-    // 1️⃣ Verificar que el usuario exista
-    const existingUser = await this.prisma.user.findUnique({ where: { id } });
-    if (!existingUser) throw new NotFoundException('Usuario no encontrado');
+    //  Verificar que el usuario exista
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id },
+    });
 
-    // 2️⃣ Validaciones básicas
-    if (dto.email && dto.email !== existingUser.email) {
-      // Chequear si el nuevo email ya existe en la DB
-      const emailExists = await this.prisma.user.findUnique({ where: { email: dto.email } });
-      if (emailExists) throw new ConflictException('El email ya está en uso');
+    if (!existingUser) {
+      throw new NotFoundException('Usuario no encontrado');
     }
 
-    // 3️⃣ Preparar los datos para actualizar
-    const data: any = { ...dto };
-    if (dto.password) {
-      if (dto.password.length < 6) {
-        throw new BadRequestException('La contraseña debe tener al menos 6 caracteres');
+    //  Regla de negocio: email único
+    if (dto.email && dto.email !== existingUser.email) {
+      const emailExists = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+
+      if (emailExists) {
+        throw new ConflictException('El email ya está en uso');
       }
+    }
+
+    // Preparar datos
+    const data: Partial<typeof dto> & { password?: string } = { ...dto };
+
+    if (dto.password) {
       data.password = await bcrypt.hash(dto.password, 10);
     }
 
+    // Actualizar
     try {
       const updatedUser = await this.prisma.user.update({
         where: { id },
         data,
       });
 
-      return { id: updatedUser.id, name: updatedUser.name, email: updatedUser.email };
+      return {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+      };
     } catch (error) {
       throw new InternalServerErrorException('Error al actualizar el usuario');
     }

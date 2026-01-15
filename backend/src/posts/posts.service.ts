@@ -2,13 +2,14 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException,
 import { PrismaService } from '../common/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   // Listar todos los posts con paginación
-  async getAll(page: number = 1, limit: number = 10) {
+  async getAll(page: number = 1, limit: number = 5) {
     if (page < 1) throw new BadRequestException('Página inválida');
     if (limit < 1) throw new BadRequestException('Límite inválido');
 
@@ -65,31 +66,38 @@ export class PostsService {
     }
   }
 
-  async update(id: string, userId: string, dto: UpdatePostDto) {
-    const post = await this.prisma.post.findUnique({ where: { id } });
-    if (!post) throw new NotFoundException('Post no encontrado');
-    if (post.userId !== userId) throw new ForbiddenException('No tenés permisos para editar este post');
-
+  async update(id: string, dto: UpdatePostDto) {
     const data: any = {};
+
     if (dto.title !== undefined) {
-      if (dto.title.trim() === '') throw new BadRequestException('El título no puede estar vacío');
+      if (dto.title.trim() === '') {
+        throw new BadRequestException('El título no puede estar vacío');
+      }
       data.title = dto.title;
     }
+
     if (dto.content !== undefined) {
-      if (dto.content.trim() === '') throw new BadRequestException('El contenido no puede estar vacío');
+      if (dto.content.trim() === '') {
+        throw new BadRequestException('El contenido no puede estar vacío');
+      }
       data.content = dto.content;
     }
 
     try {
-      const updatedPost = await this.prisma.post.update({
+      return await this.prisma.post.update({
         where: { id },
         data,
-        include: { user: { select: { id: true, name: true, email: true } } },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+        },
       });
-      return updatedPost;
     } catch (error) {
       throw new InternalServerErrorException('Error al actualizar el post');
     }
+    
   }
+
 }
 

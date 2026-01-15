@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Body, UseGuards, Req, Query, ParseIntPipe } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -10,8 +10,11 @@ export class PostsController {
   constructor(private postsService: PostsService) {}
 
   @Get()
-  getAll() {
-    return this.postsService.getAll();
+  getAll(
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 5,
+  ) {
+    return this.postsService.getAll(page, limit);
   }
 
   @Get(':id')
@@ -22,14 +25,15 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Req() req, @Body() dto: CreatePostDto) {
-    return this.postsService.create(req.user, dto);
+    return this.postsService.create(req.user.id, dto);
   }
 
   @UseGuards(JwtAuthGuard, PostOwnerGuard)
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdatePostDto, @Req() req) {
-    // Aquí podés agregar un guard de propietario si querés
-    const userId = req.user.id;
-    return this.postsService.update(id, userId, dto);
+  updatePost(
+    @Param('id') id: string,
+    @Body() dto: UpdatePostDto,
+  ) {
+    return this.postsService.update(id, dto);
   }
 }

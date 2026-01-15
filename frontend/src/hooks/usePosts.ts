@@ -5,7 +5,7 @@ export interface Post {
   id: string;
   title: string;
   content: string;
-  user?: { name: string };
+  user?: { name: string, id: string };
 }
 
 export const usePosts = () => {
@@ -21,17 +21,15 @@ export const usePosts = () => {
       setError(null);
 
       try {
-        const response = await apiFetch(`/posts?page=${page}&limit=10`);
+        const response = await apiFetch(`/posts?page=${page}&limit=5`);
 
         setPosts(response.data ?? []);
-        setTotalPages(response.meta.totalPages );
+        setTotalPages(response.meta?.lastPage ?? 1);
 
       } catch (err) {
-        
         console.error("Error al obtener posts", err);
         setError("No se pudieron cargar los posts");
         setPosts([]);
-
       } finally {
         setLoading(false);
       }
@@ -49,5 +47,6 @@ export const usePosts = () => {
     error,
   };
 };
+
 
 
