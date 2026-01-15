@@ -12,7 +12,7 @@ export class PostsController {
   @Get()
   getAll(
     @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('limit', ParseIntPipe) limit: number = 5,
   ) {
     return this.postsService.getAll(page, limit);
   }

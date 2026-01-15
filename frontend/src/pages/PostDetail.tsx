@@ -16,3 +16,4 @@ export const PostDetail = () => {
     </div>
   );
 };
+export default PostDetail;
